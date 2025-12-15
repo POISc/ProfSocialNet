@@ -1,3 +1,32 @@
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #0e110e;
+    gap: 10px;
+    padding: 20px;
+    width: 400px;
+    border-radius: 8px;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+
 .post-section {
     width: 40%;
 
@@ -39,7 +68,7 @@
     overflow: hidden;
 }
 
-.dropdown-menu-content form button{
+.dropdown-menu-content form button, .dropdown-menu-content button{
     width: 100%;
     padding: 10px 10px;
     border-radius: 0;

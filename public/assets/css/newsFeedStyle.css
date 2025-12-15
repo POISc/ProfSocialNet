@@ -1,3 +1,32 @@
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #0e110e;
+    gap: 10px;
+    padding: 20px;
+    width: 400px;
+    border-radius: 8px;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+
 #create-post-content {
     min-height: 100px;
     max-height: 300px;
@@ -51,4 +80,52 @@
     padding-bottom: 20px;
 
     max-height: 200px;
+}
+
+.additional-actions-selector {
+    position: absolute;
+    width: auto;
+    height: 15px;
+    right: 0;
+    top: 0;
+}
+
+.additional-actions-selector .dropbtn {
+    margin: 0;
+    padding: 5px;
+    background: transparent;
+}
+
+.dropdown-menu-content form {
+    float: none;
+    padding: 0;
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+}
+
+.dropdown-menu-content form button, .dropdown-menu-content button{
+    width: 100%;
+    padding: 10px 10px;
+    border-radius: 0;
+}
+
+.dropdown-menu-content {
+    border-radius: 4px;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 1;
+
+    right: 0;
+
+    transform: scale(0);
+    transform-origin: top right;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.additional-actions-selector:hover .dropdown-menu-content {
+    transform: scale(1);
 }

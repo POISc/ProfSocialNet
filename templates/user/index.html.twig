@@ -15,7 +15,12 @@
 
             <form method="post" action="{{ path('user_edit', {'id': user.id}) }}">
                 <input type="text" name="fullName" value="{{ app.user.fullName }}">
-                <textarea name="about">{{ app.user.description }}</textarea>
+                <input type="text" name="uuid" value="{{ app.user.uuid }}">
+                <textarea placeholder="Write your skils" name="skils"> {{ user.skils ? user.skils|join(', ') : 'Нет навыков' }}</textarea>
+                <textarea placeholder="Discription..." name="description">{{ app.user.description }}</textarea>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('edit_user' ~ user.id) }}">
+                <input type="hidden" name="_method" value="PUT">
 
                 <button type="submit">Сохранить</button>
                 <button type="button" id="closeModal">Отмена</button>
@@ -32,13 +37,13 @@
                 {{ user.uuid }}
             </div>
             <div class="user-skils">
-                {{ user.skils }}
+                {{ user.skils ? user.skils|join(', ') : 'Навыки не прописаны' }}
             </div>
             <div class="user-description">
                 {{ user.description }}
             </div>
 
-            {% if app.user and app.user.id == user.id %} <button class="action-buton user-edit-button">Редактировать</button> {% endif %}
+            {% if app.user and app.user.id == user.id %} <button id="user-edit-button" class="action-buton">Редактировать</button> {% endif %}
         </div>
 
         {% if app.user and app.user.id == user.id %}
@@ -78,4 +83,5 @@
     {% include 'components/quick-news.html.twig' %}
     
     <script src="{{ asset('assets/scripts/reactPost.js') }}"></script>
+    <script src="{{ asset('assets/scripts/popupLogic.js') }}"></script>
 {% endblock %}

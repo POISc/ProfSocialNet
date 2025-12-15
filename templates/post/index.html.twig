@@ -9,6 +9,22 @@
 {% block body %}
     {% include 'components/navigation-bar.html.twig' %}
     
+    <div id="editPostModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Редактирование поста</h2>
+
+            <form id="editPostForm" method="post">
+                <textarea name="content" placeholder="Содержание поста">{{ post.content }}</textarea>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('edit_post' ~ post.id) }}">
+                <input type="hidden" name="_method" value="PUT">
+                <input type="hidden" name="post_id" value="">
+
+                <button type="submit">Сохранить</button>
+                <button type="button" id="closeModal">Отмена</button>
+            </form>
+        </div>
+    </div>
 
     <div class="post-section">
         <div class="post-box">
@@ -31,12 +47,9 @@
                     <div class="additional-actions-selector">
                         <button class="dropbtn">...</button>
                         <div class="dropdown-menu-content">
-                            <form method="post" action="{{ path('post_change', {'id': post.id}) }}">
-                                <input type="hidden" name="_method" value="PUT">
-                                <input type="hidden" name="post_id" value="{{ post.id }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
-                                <button class="action-buton" type="submit">Изменить</button>
-                            </form>
+                            <button class="edit-post-button action-buton" data-id="{{ post.id }}" data-content="{{ post.content }}" data-token="{{ csrf_token('edit_post' ~ post.id) }}">
+                                Редактировать
+                            </button>
                             <form method="post" action="{{ path('post_delete', {'id': post.id}) }}">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <input type="hidden" name="post_id" value="{{ post.id }}">
@@ -77,5 +90,6 @@
 
     {% include 'components/quick-news.html.twig' %}
 
-    <script src="{{ asset('assets/scripts/reactPost.js') }}"></script>
+    <script src="{{ asset('assets/scripts/reactPost.js') }}"></script>    
+    <script src="{{ asset('assets/scripts/popupPostLogic.js') }}"></script>
 {% endblock %}

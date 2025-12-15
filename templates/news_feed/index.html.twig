@@ -2,12 +2,29 @@
 
 {% block title %}News feed{% endblock %}
 {% block stylesheets %}
-    <link rel="stylesheet" href="/assets/css/newsFeedStyle.css">
     <link rel="stylesheet" href="/assets/css/baseDarkStyle.css">
+    <link rel="stylesheet" href="/assets/css/newsFeedStyle.css">
 {% endblock %}
 
 {% block body %}
     {% include 'components/navigation-bar.html.twig' %}
+
+    <div id="editPostModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Редактирование поста</h2>
+
+            <form id="editPostForm" method="post">
+                <textarea name="content" placeholder="Содержание поста"></textarea>
+
+                <input type="hidden" name="_method" value="PUT">
+                <input type="hidden" name="_csrf_token" value="">
+                <input type="hidden" name="post_id" value="">
+
+                <button type="submit">Сохранить</button>
+                <button type="button" id="closeModal">Отмена</button>
+            </form>
+        </div>
+    </div>
 
     <div class="news-feed-section">
         <div class="create-post-box">
@@ -39,6 +56,23 @@
                     </div>
 
                     <a href="{{ path('post_view', {'id': post.id}) }}" class="post-link"> комменты </a>
+
+                    {% if app.user and app.user.id == post.author.id %}
+                        <div class="additional-actions-selector">
+                            <button class="dropbtn">...</button>
+                            <div class="dropdown-menu-content">
+                                <button class="edit-post-button action-buton" data-id="{{ post.id }}" data-content="{{ post.content }}" data-token="{{ csrf_token('edit_post' ~ post.id) }}">
+                                    Редактировать
+                                </button>
+                                <form method="post" action="{{ path('post_delete', {'id': post.id}) }}">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                                    <button class="action-buton" type="submit">Удалить пост</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
                 
             {% endfor %}
@@ -52,4 +86,5 @@
     {% include 'components/quick-news.html.twig' %}
     
     <script src="{{ asset('assets/scripts/reactPost.js') }}"></script>
+    <script src="{{ asset('assets/scripts/popupPostLogic.js') }}"></script>
 {% endblock %}

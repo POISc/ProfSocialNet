@@ -44,10 +44,7 @@ final class NewsFeedController extends AbstractController
         }
 
         $referer = $request->headers->get('referer');
-
-        if ($referer) {
-            $session->set('return_last_safe_url', $referer);
-        }
+        $session->set('return_last_safe_url', $referer);
 
         return $this->render('news_feed/index.html.twig', [
             'posts' => $posts,

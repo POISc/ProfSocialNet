@@ -82,7 +82,18 @@ final class PostController extends AbstractController
     #[Route('/post/change/{id}', name: 'post_change', methods: ['PUT'])]
     public function changePost(Post $post, Request $request, Security $security): Response
     {
-        // изменить пост
+        if (!$this->isCsrfTokenValid('edit_post' . $post->getId(), $request->request->get('_csrf_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token');
+        }
+
+        if ($security->getUser() !== $post->getAuthor()) {
+            throw $this->createAccessDeniedException('You are not allowed to edit this post');
+        }
+
+        $post->setContent($request->request->get('content'));
+        $this->em->flush();
+
+        return $this->redirectToRoute('post_view', ['id' => $post->getId()]);
     }
 
     #[Route('/post/delete/{id}', name: 'post_delete', methods: ['DELETE'])]

@@ -9,7 +9,7 @@
             {% for user in foundUsers %}
                 <a href="{{ path('app_user', {'id': user.id}) }}" class="nav-link">
                     <div class="user-name"> {{ user.fullName }} </div>
-                    <div class="user-skils"> {{ user.skils }} </div>
+                    <div class="user-skils">  {{ user.skils ? user.skils|join(', ') : 'Нет навыков' }} </div>
                 </a>
             {% endfor %}
         </div>  

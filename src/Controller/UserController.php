@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,7 +31,7 @@ final class UserController extends AbstractController
         $this->reactionRepository = $reactionRepository;
     }
 
-    #[Route('/user/{id}', name: 'app_user')]
+    #[Route('/user/{id}', name: 'app_user', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function index(User $user, Request $request, SessionInterface $session): Response
     {
         $searchTerm = $request->query->get('search', '');
@@ -53,10 +54,7 @@ final class UserController extends AbstractController
         }
 
         $referer = $request->headers->get('referer');
-
-        if ($referer) {
-            $session->set('return_last_safe_url', $referer);
-        }
+        $session->set('return_last_safe_url', $referer);
 
 
         return $this->render('user/index.html.twig', [
@@ -68,19 +66,28 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/user/{id}', name: 'user_edit')]
-    public function edit(User $user, Request $request): Response
+    #[Route('/user/{id}', name: 'user_edit', methods: ['PUT'])]
+    public function edit(User $user, Request $request, EntityManagerInterface $em): RedirectResponse
     {
-        $searchTerm = $request->query->get('search', '');
-        $foundUsers = [];
-        if (!empty($searchTerm)) {
-            $foundUsers = $this->userRepository->findByNamePartial($searchTerm);
+        $csrfToken = $request->request->get('_csrf_token');
+        if (!$this->isCsrfTokenValid('edit_user' . $user->getId(), $csrfToken)) {
+            throw $this->createAccessDeniedException('Неверный CSRF токен.');
         }
 
-        return $this->render('user/index.html.twig', [
-            'user' => $user,
-            'searchTerm' => $searchTerm,
-            'foundUsers' => $foundUsers,
-        ]);
+        $fullName = $request->request->get('fullName', $user->getFullName());
+        $uuid = $request->request->get('uuid', $user->getUuid());
+        $skilsRaw = $request->request->get('skils', '');
+        $skils = $skilsRaw !== '' ? array_map('trim', explode(',', $skilsRaw)) : null;
+        $description = $request->request->get('description', $user->getDescription());
+
+        $user->setFullName($fullName);
+        $user->setUuid($uuid);
+        $user->setSkils($skils);
+        $user->setDescription($description);
+
+        $em->persist($user);
+        $em->flush();
+
+        return $this->redirect($request->headers->get('referer'));
     }
 }
