@@ -18,9 +18,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use App\Entity\Reaction;
 use App\Repository\ReactionRepository;
 use App\Enum\ReactionType;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\NotificationService;
 
 final class PostController extends AbstractController
 {
@@ -108,7 +107,7 @@ final class PostController extends AbstractController
     }
 
     #[Route('/post/react/{id}', name: 'post_react', methods: ['POST'])]
-    public function reaction(Post $post, Request $request, Security $security, ReactionRepository $reactionRepository, HubInterface $hub): JsonResponse
+    public function reaction(Post $post, Request $request, Security $security, ReactionRepository $reactionRepository, NotificationService $notificationService): JsonResponse
     {
         if (!$this->isCsrfTokenValid('react' . $post->getId(), $request->request->get('_token'))) {
             return new JsonResponse(['error' => 'Invalid CSRF token'], 400);
@@ -127,12 +126,14 @@ final class PostController extends AbstractController
 
             $reaction->setType($reactionType);
             $this->em->persist($reaction);
+            $notificationService->notifyUserReaction($reaction);
         }
         else if($reactionType === $reaction->getType()) {
             $this->em->remove($reaction);    
             $reaction = null;
         }
         else {
+            $notificationService->notifyUserReaction($reaction);
             $reaction->setType($reactionType);
         }
 

@@ -12,6 +12,7 @@ use App\Entity\Post;
 use App\Entity\User;
 use App\Entity\Comment;
 use Symfony\Bundle\SecurityBundle\Security;
+use App\Service\NotificationService;
 
 final class CommentController extends AbstractController
 {
@@ -23,7 +24,7 @@ final class CommentController extends AbstractController
     }
 
     #[Route('/post/{id}/comment-create', name: 'comment_create')]
-    public function index(Post $post, Request $request, Security $security): Response
+    public function index(Post $post, Request $request, Security $security, NotificationService $notificationService): Response
     {
         $comment = new Comment();
         $comment->setAuthor($security->getUser());
@@ -32,6 +33,8 @@ final class CommentController extends AbstractController
 
         $this->em->persist($comment);
         $this->em->flush();
+
+        $notificationService->notifyUserComment($post, $security->getUser());
 
         return $this->redirectToRoute('post_view', ['id' => $post->getId()]);
     }

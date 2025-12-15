@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Enum\NotificationType;
+use App\Enum\SubjectType;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,12 +18,15 @@ class Notification
     #[ORM\ManyToOne(inversedBy: 'notifications')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $targetUser = null;
+    
+    #[ORM\ManyToOne]
+    private ?User $initiator = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $eventType = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $message = null;
+    #[ORM\Column(enumType: NotificationType::class)]
+    private ?NotificationType $eventType = null;
+    
+    #[ORM\Column(nullable: true)]
+    private ?int $subjectId = null;
 
     #[ORM\Column]
     private ?bool $isRead = null;
@@ -43,26 +48,14 @@ class Notification
         return $this;
     }
 
-    public function getEventType(): ?string
+    public function getEventType(): ?NotificationType
     {
         return $this->eventType;
     }
 
-    public function setEventType(string $eventType): static
+    public function setEventType(NotificationType $eventType): static
     {
         $this->eventType = $eventType;
-
-        return $this;
-    }
-
-    public function getMessage(): ?string
-    {
-        return $this->message;
-    }
-
-    public function setMessage(string $message): static
-    {
-        $this->message = $message;
 
         return $this;
     }
@@ -75,6 +68,30 @@ class Notification
     public function setIsRead(bool $isRead): static
     {
         $this->isRead = $isRead;
+
+        return $this;
+    }
+
+    public function getSubjectId(): ?int
+    {
+        return $this->subjectId;
+    }
+
+    public function setSubjectId(int $subjectId): static
+    {
+        $this->subjectId = $subjectId;
+
+        return $this;
+    }
+
+    public function getInitiator(): ?User
+    {
+        return $this->initiator;
+    }
+
+    public function setInitiator(?User $initiator): static
+    {
+        $this->initiator = $initiator;
 
         return $this;
     }
