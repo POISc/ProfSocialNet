@@ -1,0 +1,41 @@
+.user-log-from {
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.field {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: end;
+
+    width: 100%;
+    position: relative;
+
+}
+
+.field input {
+    margin-left: 10px;
+}
+
+
+.field label {
+    position: absolute;
+    
+    left: 0px;
+    transform: translateX(-100%);
+}
+
+.field ul {
+    position: absolute;
+
+    width: 500px;
+
+    right: 0px;
+    transform: translateX(100%);
+}

@@ -1,0 +1,75 @@
+.post-section {
+    width: 40%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.post-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-body {
+    position: relative;
+
+    min-height: 100px;
+}
+
+.additional-actions-selector {
+    position: absolute;
+    width: auto;
+    height: 15px;
+    right: 0;
+    top: 0;
+}
+
+.additional-actions-selector .dropbtn {
+    margin: 0;
+    padding: 5px;
+    background: transparent;
+}
+
+.dropdown-menu-content form {
+    float: none;
+    padding: 0;
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+}
+
+.dropdown-menu-content form button{
+    width: 100%;
+    padding: 10px 10px;
+    border-radius: 0;
+}
+
+.dropdown-menu-content {
+    border-radius: 4px;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 1;
+
+    right: 0;
+
+    transform: scale(0);
+    transform-origin: top right;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.additional-actions-selector:hover .dropdown-menu-content {
+    transform: scale(1);
+}
+
+.comment-box {
+    padding: 10px 20px;
+    margin-top: 10px;
+}
+
+.your-comment {
+    background-color: #0e110e;
+}

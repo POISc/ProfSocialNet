@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ user.uuid }}{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/css/baseDarkStyle.css">
+    <link rel="stylesheet" href="/assets/css/userStyle.css">
+{% endblock %}
+
+{% block body %}
+    {% include 'components/navigation-bar.html.twig' %}
+
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Редактирование профиля</h2>
+
+            <form method="post" action="{{ path('user_edit', {'id': user.id}) }}">
+                <input type="text" name="fullName" value="{{ app.user.fullName }}">
+                <textarea name="about">{{ app.user.description }}</textarea>
+
+                <button type="submit">Сохранить</button>
+                <button type="button" id="closeModal">Отмена</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="user-section">
+        <div class="user-info">
+            <div class="user-name">
+                {{ user.fullName }}
+            </div>
+            <div class="user-uuid">
+                {{ user.uuid }}
+            </div>
+            <div class="user-skils">
+                {{ user.skils }}
+            </div>
+            <div class="user-description">
+                {{ user.description }}
+            </div>
+
+            {% if app.user and app.user.id == user.id %} <button class="action-buton user-edit-button">Редактировать</button> {% endif %}
+        </div>
+
+        {% if app.user and app.user.id == user.id %}
+            <form class="create-post-box" action="{{ path('post_create') }}" method="post">
+                <textarea id="create-post-content" name="content" placeholder="How are you?" required></textarea>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('create_post') }}">
+
+                <div class="post-actions">
+                    <button class="action-buton" type="submit">Опубликовать</button>
+                </div>
+            </form>  
+        {% endif %}
+
+        {% if posts is not empty %}
+            <div class ="posts-list">
+            {% for post in posts %}
+                {% set currData = postCounts[post.id] %}
+                <div class="post-box">
+                    <div class="content-post">{{ post.content }}</div>
+                    {% if post.attachments is not empty %} <div class="attachments-post"> attachments is exist</div> {% endif %}
+                    <div class="post-reactions" data-id="{{ post.id }}" data-token="{{ csrf_token('react' ~ post.id) }}">
+                        <button class="action-buton like-button {{ currData.currentUserReaction == 'like' ? 'active-element': ''}}" ><img class="icon" src="{{ asset('assets/icons/Like.png') }}"> <span class="like-count">{{ currData.counts.likes }}</span></button>
+                        <button class="action-buton dislike-button {{ currData.currentUserReaction == 'dislike' ? 'active-element': ''}}"><img class="icon" src="{{ asset('assets/icons/Dislike.png') }}"> <span class="dislike-count">{{ currData.counts.dislikes }}</span></button>
+                    </div>
+
+                    <a href="{{ path('post_view', {'id': post.id}) }}" class="post-link"> комменты </a>
+                </div>
+                
+            {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-posts">Нет никаких постов</div>
+        {% endif %}  
+    </div>
+    
+    {% include 'components/quick-news.html.twig' %}
+    
+    <script src="{{ asset('assets/scripts/reactPost.js') }}"></script>
+{% endblock %}

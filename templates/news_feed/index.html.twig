@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}News feed{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/css/newsFeedStyle.css">
+    <link rel="stylesheet" href="/assets/css/baseDarkStyle.css">
+{% endblock %}
+
+{% block body %}
+    {% include 'components/navigation-bar.html.twig' %}
+
+    <div class="news-feed-section">
+        <div class="create-post-box">
+            <form action="{{ path('post_create') }}" method="post">
+                <div class="create-post-inner">
+
+                    <div class="post-input">
+                        <textarea id="create-post-content" name="content" placeholder="How are you?" required></textarea>
+                                    
+                        <div class="post-actions">
+                            <button class="action-buton" type="submit">Опубликовать</button>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        {% if posts is not empty %}
+            <div class ="posts-list">
+            {% for post in posts %}
+                {% set currData = postCounts[post.id] %}
+                <div class="post-box">
+                    <div class="content-post">{{ post.content }}</div>
+                    {% if post.attachments is not empty %} <div class="attachments-post"> attachments is exist</div> {% endif %}
+                    <div class="post-reactions" data-id="{{ post.id }}" data-token="{{ csrf_token('react' ~ post.id) }}">
+                        <button class="action-buton like-button {{ currData.currentUserReaction == 'like' ? 'active-element': ''}}" ><img class="icon" src="{{ asset('assets/icons/Like.png') }}"> <span class="like-count">{{ currData.counts.likes }}</span></button>
+                        <button class="action-buton dislike-button {{ currData.currentUserReaction == 'dislike' ? 'active-element': ''}}"><img class="icon" src="{{ asset('assets/icons/Dislike.png') }}"> <span class="dislike-count">{{ currData.counts.dislikes }}</span></button>
+                    </div>
+
+                    <a href="{{ path('post_view', {'id': post.id}) }}" class="post-link"> комменты </a>
+                </div>
+                
+            {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-posts">Нет никаких постов</div>
+        {% endif %}
+    </div>
+
+    
+    {% include 'components/quick-news.html.twig' %}
+    
+    <script src="{{ asset('assets/scripts/reactPost.js') }}"></script>
+{% endblock %}

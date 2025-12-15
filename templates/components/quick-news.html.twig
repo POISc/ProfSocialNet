@@ -1,0 +1,17 @@
+<div class="qick-news">
+    <form class="serch-from" method="get">
+        <input id="search-field-line" type="text" name="search" placeholder="Search...", value="{{ searchTerm }}">
+        <button id="search-field-button" type="submit"><img src="{{ asset('assets/icons/Search.png') }}"></button>
+    </form>
+
+    {% if foundUsers is not empty %}
+        <div class="found-users-list">
+            {% for user in foundUsers %}
+                <a href="{{ path('app_user', {'id': user.id}) }}" class="nav-link">
+                    <div class="user-name"> {{ user.fullName }} </div>
+                    <div class="user-skils"> {{ user.skils }} </div>
+                </a>
+            {% endfor %}
+        </div>  
+    {% endif %}
+</div>

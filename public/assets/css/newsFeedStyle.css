@@ -1,0 +1,54 @@
+#create-post-content {
+    min-height: 100px;
+    max-height: 300px;
+
+    font-size: 16px;
+}
+
+.news-feed-section {
+    width: 40%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.create-post-box {
+    background-color: #0e110e;
+    border-radius: 10px;
+
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.posts-list {
+    background-color: #0e110e;
+    border-radius: 10px;
+    border: solid 2px #6b6b6b;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.post-input {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.post-link {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.post-box {
+    border-bottom: solid 1px #6b6b6b;
+    border-radius: 0;
+    padding: 10px 20px;
+    padding-bottom: 20px;
+
+    max-height: 200px;
+}

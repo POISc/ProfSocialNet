@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{post.content}}{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/css/baseDarkStyle.css">
+    <link rel="stylesheet" href="/assets/css/postPageStyle.css">
+{% endblock %}
+
+{% block body %}
+    {% include 'components/navigation-bar.html.twig' %}
+    
+
+    <div class="post-section">
+        <div class="post-box">
+            <div class="post-head">
+                <a class="nav-link">
+                    {{ post.author.fullName }}
+                </a>
+            </div> 
+
+            <div class="post-body">
+                <div class="content-post">
+                    {{ post.content|nl2br }}
+                </div>
+
+                {% if post.attachments is not empty %}
+                    <div class="attachments-post"></div>
+                {% endif %}
+
+                {% if app.user and app.user.id == post.author.id %}
+                    <div class="additional-actions-selector">
+                        <button class="dropbtn">...</button>
+                        <div class="dropdown-menu-content">
+                            <form method="post" action="{{ path('post_change', {'id': post.id}) }}">
+                                <input type="hidden" name="_method" value="PUT">
+                                <input type="hidden" name="post_id" value="{{ post.id }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                                <button class="action-buton" type="submit">Изменить</button>
+                            </form>
+                            <form method="post" action="{{ path('post_delete', {'id': post.id}) }}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="hidden" name="post_id" value="{{ post.id }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                                <button class="action-buton" type="submit">Удалить пост</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="post-reactions" data-id="{{ post.id }}" data-token="{{ csrf_token('react' ~ post.id) }}">
+                <button class="action-buton like-button {{ userReaction == 'like' ? 'active-element' : '' }}"><img class="icon" src="{{ asset('assets/icons/Like.png') }}"> <span class="like-count">{{ postCounts[post.id].likes }}</span></button>
+                <button class="action-buton dislike-button {{ userReaction == 'dislike' ? 'active-element' : '' }}"><img class="icon" src="{{ asset('assets/icons/Dislike.png') }}"> <span class="dislike-count">{{ postCounts[post.id].dislikes }}</span></button>
+            </div>
+        </div>
+
+        
+        <div class="comments-section">
+            <form class="create-comm-box" action="{{ path('comment_create', {'id': post.id}) }}" method="post">
+                <input id="input-comment-filed" name="content" placeholder="Comment..." required>
+
+                <button class="action-buton" type="submit">Подтвердить</button>
+            </form>
+
+            {% if post.comments is not empty %}
+                {% for comment in post.comments %}
+                    <div class="comment-box {% if app.user and app.user.id == comment.author.id %}your-comment{% endif %}">
+                        <div class="comment-author">{{ comment.author.fullName }}</div>
+                        <div class="comment-content">{{ comment.content }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-comments">No comments yet</div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'components/quick-news.html.twig' %}
+
+    <script src="{{ asset('assets/scripts/reactPost.js') }}"></script>
+{% endblock %}

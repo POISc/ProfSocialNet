@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/css/baseDarkStyle.css">
+    <link rel="stylesheet" href="/assets/css/login-outStyle.css">
+{% endblock %}
+
+{% block body %}
+<div>
+    {% if app.user %}
+        <div class="mb-3">
+            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
+        </div>
+    {% endif %}
+
+    {{ form_errors(registrationForm) }}
+
+    {{ form_start(registrationForm, {attr: {class: 'user-log-from'}}) }}
+    <h1>Регистрация</h1>
+
+        <div class="field">
+            {{ form_label(registrationForm.fullName, 'Реальное имя') }}
+            {{ form_widget(registrationForm.fullName) }}
+            {{ form_errors(registrationForm.fullName) }}
+        </div>
+        <div class="field">
+            {{ form_label(registrationForm.uuid, 'Уникальное имя') }}
+            {{ form_widget(registrationForm.uuid) }}
+            {{ form_errors(registrationForm.uuid) }}
+        </div>
+        <div class="field">
+            {{ form_label(registrationForm.plainPassword, 'Пароль') }}
+            {{ form_widget(registrationForm.plainPassword) }}
+            {{ form_errors(registrationForm.plainPassword) }}
+        </div>
+
+        <div class="agree-terms-field">
+            {{ form_widget(registrationForm.agreeTerms) }}
+            {{ form_label(registrationForm.agreeTerms, 'Я согласен') }}
+        </div>
+
+        <div class="field">
+            <span> Если уже зарегестрированны, <a href="{{ path('app_login') }}">войти</a> </span>
+        </div>
+
+        <button type="submit" class="action-buton">Регистрация</button>
+    {{ form_end(registrationForm) }}
+</div>
+{% endblock %}

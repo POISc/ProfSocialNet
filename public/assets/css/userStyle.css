@@ -1,0 +1,84 @@
+#editModal {
+    position: absolute;
+}
+
+.user-section {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+
+    width: 40%;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    background-color: #0e110e;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.user-name {
+    margin-top: 10px;
+    font-size: 20px;
+}
+
+.user-uuid {
+    font-size: 14px;
+    color: #6b6b6b;
+}
+
+.user-skils {
+    min-height: 20px;
+    font-size: 12px;
+}
+
+.user-description {
+    min-height: 40px;
+}
+
+.user-edit-button {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.create-post-box {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    background-color: #0e110e;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.create-post-box textarea {
+    min-height: 100px;
+    max-height: 300px;
+
+    font-size: 16px;
+}
+
+.posts-list {
+    background-color: #0e110e;
+    border-radius: 10px;
+    border: solid 2px #6b6b6b;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.post-box {
+    border-bottom: solid 1px #6b6b6b;
+    border-radius: 0;
+    padding: 10px 20px;
+    padding-bottom: 20px;
+
+    max-height: 200px;
+}
