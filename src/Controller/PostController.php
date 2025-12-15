@@ -140,15 +140,6 @@ final class PostController extends AbstractController
         
         $countsReactions = $reactionRepository->getReactionsCount($post);
 
-        //------------------------ Отправка обновления через Mercure -----------------------
-
-        // $topic = 'http://localhost:8000/user/' . $authorId . '/notifications';
-
-        // $update = new Update($topic, json_encode($data));
-        // $hub->publish($update);
-
-        //------------------------------- Завершение реакции -------------------------------
-
         return $this->json(['likes' => $countsReactions['likes'],
             'dislikes' => $countsReactions['dislikes'],
             'userReaction' => $reaction?->getType()?->value

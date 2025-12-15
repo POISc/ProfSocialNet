@@ -10,31 +10,5 @@
     </head>
     <body>
         {% block body %}{% endblock %}
-        {# <script>
-            let notificationCount = 0;
-
-            const authorId = {{ app.user.id }};
-
-            const topic = 'http://localhost:8000/user/' + authorId + '/notifications';
-
-            const es = new EventSource(
-                'http://localhost:3000/.well-known/mercure?topic=' + encodeURIComponent(topic)
-            );
-
-            es.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                console.log('Новое уведомление:', data.message);
-
-                notificationCount++;
-
-                const counterSpan = document.getElementById('notification-counter');
-                counterSpan.textContent = notificationCount;
-            };
-
-            document.querySelector('.nav-link').addEventListener('click', () => {
-                notificationCount = 0;
-                document.getElementById('notification-counter').textContent = '';
-            });
-        </script> #}
     </body>
 </html>

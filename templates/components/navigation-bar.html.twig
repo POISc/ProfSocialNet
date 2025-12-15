@@ -1,5 +1,9 @@
 <div class="navigation-bar">
-        <a href="{{ path('app_user', {'id': app.user.id}) }}" class="nav-link"><img class="icon" src="{{ asset('assets/icons/Profile.png') }}"> Профиль</a>
+        {% if app.user is not empty %}
+            <a href="{{ path('app_user', {'id': app.user.id}) }}" class="nav-link"><img class="icon" src="{{ asset('assets/icons/Profile.png') }}"> Профиль</a>
+        {% else %}
+            <a href="{{ path('app_login') }}" class="nav-link"><img class="icon" src="{{ asset('assets/icons/User.png') }}"> Войти</a>
+        {% endif %}
         <a href="{{ path('app_news_feed') }}" class="nav-link"><img class="icon" src="{{ asset('assets/icons/Home.png') }}"> Главная</a>
         <a href="" class="nav-link"><img class="icon" src="{{ asset('assets/icons/Bell-Notification.png') }}"> Уведомления <span id="notification-counter"></span></a>
         {% if app.user is not empty %}<a href="{{ path('app_logout') }}" class="nav-link"><img class="icon" src="{{ asset('assets/icons/Door-Logout.png') }}"> Выйти</a>{% endif %}

@@ -74,6 +74,7 @@
 }
 
 .post-box {
+    position: relative;
     border-bottom: solid 1px #6b6b6b;
     border-radius: 0;
     padding: 10px 20px;
@@ -86,8 +87,8 @@
     position: absolute;
     width: auto;
     height: 15px;
-    right: 0;
-    top: 0;
+    right: 10px;
+    top: 5px;
 }
 
 .additional-actions-selector .dropbtn {
