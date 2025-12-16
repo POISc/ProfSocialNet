@@ -51,12 +51,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $connections;
 
     /**
-     * @var Collection<int, Connection>
-     */
-    #[ORM\OneToMany(targetEntity: Connection::class, mappedBy: 'targetUser')]
-    private Collection $incomingConnection;
-
-    /**
      * @var Collection<int, Post>
      */
     #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'author', orphanRemoval: true)]
@@ -74,13 +68,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'targetUser', orphanRemoval: true)]
     private Collection $notifications;
 
+    /**
+     * @var Collection<int, Company>
+     */
+    #[ORM\ManyToMany(targetEntity: Company::class, inversedBy: 'trustedPersons')]
+    private Collection $subordinateСompanies;
+
     public function __construct()
     {
         $this->connections = new ArrayCollection();
-        $this->incomingConnection = new ArrayCollection();
         $this->posts = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->notifications = new ArrayCollection();
+        $this->subordinateСompanies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -179,66 +179,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Connection>
-     */
-    public function getConnections(): Collection
-    {
-        return $this->connections;
-    }
-
-    public function addConnection(Connection $connection): static
-    {
-        if (!$this->connections->contains($connection)) {
-            $this->connections->add($connection);
-            $connection->setUserO($this);
-        }
-
-        return $this;
-    }
-
-    public function removeConnection(Connection $connection): static
-    {
-        if ($this->connections->removeElement($connection)) {
-            // set the owning side to null (unless already changed)
-            if ($connection->getUserO() === $this) {
-                $connection->setUserO(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Connection>
-     */
-    public function getIncomingConnection(): Collection
-    {
-        return $this->incomingConnection;
-    }
-
-    public function addIncomingConnection(Connection $incomingConnection): static
-    {
-        if (!$this->incomingConnection->contains($incomingConnection)) {
-            $this->incomingConnection->add($incomingConnection);
-            $incomingConnection->setTargetUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeIncomingConnection(Connection $incomingConnection): static
-    {
-        if ($this->incomingConnection->removeElement($incomingConnection)) {
-            // set the owning side to null (unless already changed)
-            if ($incomingConnection->getTargetUser() === $this) {
-                $incomingConnection->setTargetUser(null);
-            }
-        }
 
         return $this;
     }
@@ -348,5 +288,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // @deprecated, to be removed when upgrading to Symfony 8
+    }
+
+    /**
+     * @return Collection<int, Company>
+     */
+    public function getSubordinateСompanies(): Collection
+    {
+        return $this->subordinateСompanies;
+    }
+
+    public function addSubordinateOmpany(Company $subordinateOmpany): static
+    {
+        if (!$this->subordinateСompanies->contains($subordinateOmpany)) {
+            $this->subordinateСompanies->add($subordinateOmpany);
+        }
+
+        return $this;
+    }
+
+    public function removeSubordinateOmpany(Company $subordinateOmpany): static
+    {
+        $this->subordinateСompanies->removeElement($subordinateOmpany);
+
+        return $this;
     }
 }

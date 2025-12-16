@@ -79,8 +79,14 @@
     border-radius: 0;
     padding: 10px 20px;
     padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 
     max-height: 200px;
+}
+
+.author-post {
 }
 
 .additional-actions-selector {

@@ -24,9 +24,16 @@ class Company
     #[ORM\OneToMany(targetEntity: Vacancy::class, mappedBy: 'company', orphanRemoval: true)]
     private Collection $vacancies;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'subordinateСompanies')]
+    private Collection $trustedPersons;
+
     public function __construct()
     {
         $this->vacancies = new ArrayCollection();
+        $this->trustedPersons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -71,6 +78,33 @@ class Company
             if ($vacancy->getCompany() === $this) {
                 $vacancy->setCompany(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getTrustedPersons(): Collection
+    {
+        return $this->trustedPersons;
+    }
+
+    public function addTrustedPerson(User $trustedPerson): static
+    {
+        if (!$this->trustedPersons->contains($trustedPerson)) {
+            $this->trustedPersons->add($trustedPerson);
+            $trustedPerson->addSubordinateOmpany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrustedPerson(User $trustedPerson): static
+    {
+        if ($this->trustedPersons->removeElement($trustedPerson)) {
+            $trustedPerson->removeSubordinateOmpany($this);
         }
 
         return $this;

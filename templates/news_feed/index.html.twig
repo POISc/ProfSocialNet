@@ -48,6 +48,7 @@
             {% for post in posts %}
                 {% set currData = postCounts[post.id] %}
                 <div class="post-box">
+                    <div class="author-post"><a href="{{ path('app_user', {'id': post.author.id}) }}">{{ post.author.fullName }}</a></div>
                     <div class="content-post">{{ post.content }}</div>
                     {% if post.attachments is not empty %} <div class="attachments-post"> attachments is exist</div> {% endif %}
                     <div class="post-reactions" data-id="{{ post.id }}" data-token="{{ csrf_token('react' ~ post.id) }}">

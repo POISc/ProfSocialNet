@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notifications{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/css/baseDarkStyle.css">
+{% endblock %}
+
+{% block body %}
+    {% include 'components/navigation-bar.html.twig' %}
+
+    <div class="notification-section">
+        <h2>Уведомления</h2>
+        {% if notifications is empty %}
+            <p>Нет новых уведомлений.</p>
+        {% else %}
+            <ul class="notification-list">
+                {% for notification in notifications %}
+                    <li class="notification-item{% if not notification.isRead %} unread{% endif %}">
+                        <a href="{{ path('app_user', {'id': notification.initiator.id}) }}">
+                            {{ notification.initiator.fullName }}
+                        </a>
+
+                        {% if notification.eventType.value == 'like_to_post' %}
+                            поставил(а) лайк на ваш пост: 
+                        {% elseif notification.eventType.value == 'dislike_to_post' %}
+                            поставил(а) дизлайк на ваш пост: 
+                        {% elseif notification.eventType.value == 'comment_to_post' %}
+                            прокомментировал(а) ваш пост: 
+                        {% elseif notification.eventType.value == 'reply_to_comment' %}
+                            ответил(а) на ваш комментарий: 
+                        {% elseif notification.eventType.value == 'subscription' %}
+                            подписался(ась) на вас
+                        {% endif %}
+
+                        {% if notification.subject %}
+                            <a href="{{ path('post_view', {'id': notification.subject.id}) }}">
+                                "{{ notification.subject.content|slice(0, 15) }}{% if notification.subject.content|length > 15 %}...{% endif %}"
+                            </a>
+                        {% else %}
+                            {% if notification.eventType.value == 'subscription' %}
+                                подписался на вас
+                            {% endif %}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    {% include 'components/quick-news.html.twig' %}
+{% endblock %}

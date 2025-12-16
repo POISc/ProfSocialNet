@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\ConnectionType;
 use App\Repository\ConnectionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -17,12 +18,11 @@ class Connection
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userInitiator = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $types = null;
+    #[ORM\Column(enumType: ConnectionType::class)]
+    private ?ConnectionType $types = null;
 
-    #[ORM\ManyToOne(inversedBy: 'incomingConnection')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $targetUser = null;
+    #[ORM\Column]
+    private ?int $targetId = null;
 
     public function getId(): ?int
     {
@@ -41,24 +41,24 @@ class Connection
         return $this;
     }
 
-    public function getTypes(): ?string
+    public function getTypes(): ?ConnectionType
     {
         return $this->types;
     }
 
-    public function setTypes(string $types): static
+    public function setTypes(ConnectionType $types): static
     {
         $this->types = $types;
 
         return $this;
     }
 
-    public function getTargetUser(): ?User
+    public function getTargetId(): ?int
     {
         return $this->targetUser;
     }
 
-    public function setTargetUser(?User $targetUser): static
+    public function setTargetId(?int $targetId): static
     {
         $this->targetUser = $targetUser;
 

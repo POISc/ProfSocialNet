@@ -18,5 +18,5 @@ document.querySelectorAll('.edit-post-button').forEach(btn => {
 });
 
 document.getElementById('closeModal').addEventListener('click', () => {
-    document.getElementById('editPostModal').style.display = 'none';
+    document.getElementById('editPostModal').classList.add('hidden');
 });

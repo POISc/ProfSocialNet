@@ -79,7 +79,7 @@ final class PostController extends AbstractController
     }
 
     #[Route('/post/change/{id}', name: 'post_change', methods: ['PUT'])]
-    public function changePost(Post $post, Request $request, Security $security): Response
+    public function changePost(Post $post, Request $request, Security $security): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('edit_post' . $post->getId(), $request->request->get('_csrf_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token');
