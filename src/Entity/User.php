@@ -74,6 +74,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Company::class, inversedBy: 'trustedPersons')]
     private Collection $subordinateСompanies;
 
+    /**
+     * @var Collection<int, Company>
+     */
+    #[ORM\OneToMany(targetEntity: Company::class, mappedBy: 'owner')]
+    private Collection $companies;
+
     public function __construct()
     {
         $this->connections = new ArrayCollection();
@@ -81,6 +87,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->comments = new ArrayCollection();
         $this->notifications = new ArrayCollection();
         $this->subordinateСompanies = new ArrayCollection();
+        $this->companies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -293,23 +300,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Company>
      */
-    public function getSubordinateСompanies(): Collection
+    public function getCompanies(): Collection
     {
-        return $this->subordinateСompanies;
+        return $this->companies;
     }
 
-    public function addSubordinateOmpany(Company $subordinateOmpany): static
+    public function addCompany(Company $company): static
     {
-        if (!$this->subordinateСompanies->contains($subordinateOmpany)) {
-            $this->subordinateСompanies->add($subordinateOmpany);
+        if (!$this->companies->contains($company)) {
+            $this->companies->add($company);
+            $company->setOwner($this);
         }
 
         return $this;
     }
 
-    public function removeSubordinateOmpany(Company $subordinateOmpany): static
+    public function removeCompany(Company $company): static
     {
-        $this->subordinateСompanies->removeElement($subordinateOmpany);
+        if ($this->companies->removeElement($company)) {
+            // set the owning side to null (unless already changed)
+            if ($company->getOwner() === $this) {
+                $company->setOwner(null);
+            }
+        }
 
         return $this;
     }

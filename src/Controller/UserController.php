@@ -43,7 +43,7 @@ final class UserController extends AbstractController
         $searchTerm = $request->query->get('search', '');
         $foundUsers = [];
         if (!empty($searchTerm)) {
-            $foundUsers = $this->userRepository->findByNamePartial($searchTerm);
+            $foundUsers = $this->userRepository->serchByNameOrSkills($searchTerm);
         }
 
         $postCounts = [];

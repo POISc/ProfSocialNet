@@ -23,7 +23,7 @@ final class NewsFeedController extends AbstractController
     #[Route('/feed', name: 'app_news_feed')]
     public function index(PostRepository $postRepository, UserRepository $userRepository, Request $request, ReactionRepository $reactionRepository, Security $security, SessionInterface $session): Response
     {
-        $posts = $postRepository->findAllOrderByLikes();
+        $posts = $postRepository->findAllOrderByRating();
 
         $postCounts = [];
         $user = $security->getUser();
@@ -40,7 +40,7 @@ final class NewsFeedController extends AbstractController
         $searchTerm = $request->query->get('search', '');
         $foundUsers = [];
         if (!empty($searchTerm)) {
-            $foundUsers = $userRepository->findByNamePartial($searchTerm);
+            $foundUsers = $userRepository->serchByNameOrSkills($searchTerm);
         }
 
         $referer = $request->headers->get('referer');

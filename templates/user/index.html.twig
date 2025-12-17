@@ -16,7 +16,7 @@
             <form method="post" action="{{ path('user_edit', {'id': user.id}) }}">
                 <input type="text" name="fullName" value="{{ app.user.fullName }}">
                 <input type="text" name="uuid" value="{{ app.user.uuid }}">
-                <textarea placeholder="Write your skils" name="skils">{% if user.skils is not empty %} user.skils|join(', ') {% endif %}</textarea>
+                <textarea placeholder="Write your skils" name="skils">{% if user.skils is not empty %} {{ user.skils|join(', ') }} {% endif %}</textarea>
                 <textarea placeholder="Discription..." name="description">{{ app.user.description }}</textarea>
 
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('edit_user' ~ user.id) }}">
@@ -72,6 +72,21 @@
 
             {% if app.user and app.user.id == user.id %} <button id="user-edit-button" class="action-buton">Редактировать</button> {% endif %}
         </div>
+
+        {% if app.user and app.user.id == user.id %}
+        <form action="{{ path('company_create') }}" method="POST">
+            <input type="hidden" name="_token" value="{{ csrf_token('create_company') }}">
+
+            <div>
+                <label for="nameCompany">Company Name:</label>
+                <input type="text" id="nameCompany" name="nameCompany" required>
+            </div>
+
+            <div>
+                <button type="submit">Create Company</button>
+            </div>
+        </form>
+        {% endif %}
 
         {% if app.user and app.user.id == user.id %}
             <form class="create-post-box" action="{{ path('post_create') }}" method="post">

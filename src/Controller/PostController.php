@@ -41,7 +41,7 @@ final class PostController extends AbstractController
 
         $foundUsers = [];
         if (!empty($searchTerm)) {
-            $foundUsers = $userRepository->findByNamePartial($searchTerm);
+            $foundUsers = $userRepository->serchByNameOrSkills($searchTerm);
         }
 
         $postCounts = [$post->getId() => $post->getReactionsCount($reactionRepository)];

@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello CompanyController!{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/css/baseDarkStyle.css">
+{% endblock %}
+
+{% block body %}
+<div class="company-section">
+
+    {# -------- Компания -------- #}
+    <section class="company-header">
+        <h1>{{ company.nameCompany }}</h1>
+
+        <div class="company-owner">
+            Владелец:
+            <a href="{{ path('app_user', { id: company.owner.id }) }}">
+                {{ company.owner.fullName }}
+            </a>
+        </div>
+    </section>
+
+    <form action="{{ path('company_delete', {'id': company.id}) }}" method="post" onsubmit="return confirm('Удалить компанию?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete_company' ~ company.id) }}">
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="submit">Удалить компанию</button>
+    </form>
+
+    {% if app.user and app.user.id == company.owner.id %}
+    <form action="{{ path('vacancy_create') }}" method="POST">
+        <input type="hidden" name="_token" value="{{ csrf_token('create_vacancy') }}">
+        <input type="hidden" name="company" value="{{ company.id }}">
+
+        <div>
+            <label for="nameVacancy">Названи вакансии:</label>
+            <input type="text" id="nameVacancy" name="nameVacancy" required>
+        </div>
+
+        <div>
+            <label for="description">Описание:</label>
+            <textarea id="description" name="description"></textarea>
+        </div>
+
+        <div>
+            <label for="skills">Требуемые скилы:</label>
+            <input type="text" id="skills" name="skills">
+        </div>
+
+        <div>
+            <button type="submit">Создать вакансию</button>
+        </div>
+    </form>
+    {% endif %}
+
+    <section class="company-vacancies">
+        <h2>Вакансии</h2>
+
+        {% if company.vacancies is empty %}
+            <p>Вакансий пока нет.</p>
+        {% else %}
+            {% for post in company.vacancies %}
+                <article class="vacancy-card">
+                    <h3 class="vacancy-title">
+                        {{ post.nameVacancy }}
+                    </h3>
+
+                    <div class="vacancy-description">
+                        {{ post.description }}
+                    </div>
+
+                    <div class="vacancy-skills">
+                        <strong>Требования:</strong>
+
+                        {% if post.skills is empty %}
+                            <span>не указаны</span>
+                        {% else %}
+                            <span>
+                                {{ post.skills|join(', ') }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    {% if app.user and app.user.id == company.owner.id %}
+                    <form action="{{ path('vacancy_delete', {'id': post.id}) }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_vacancy' ~ post.id) }}">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit">Удалить вакансию</button>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

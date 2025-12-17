@@ -18,17 +18,24 @@ class PostRepository extends ServiceEntityRepository
         parent::__construct($registry, Post::class);
     }
 
-    public function findAllOrderByLikes(): array
+    public function findAllOrderByRating(): array
     {
-        return $this->createQueryBuilder('p')
-            ->leftJoin('p.reactions', 'r', 'WITH', 'r.type = :likeType')
-            ->addSelect('COUNT(r.id) AS HIDDEN likesCount')
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.reactions', 'rl', 'WITH', 'rl.type = :likeType')
             ->setParameter('likeType', ReactionType::LIKE)
+            ->leftJoin('p.reactions', 'rd', 'WITH', 'rd.type = :dislikeType')
+            ->setParameter('dislikeType', ReactionType::DISLIKE)
+            ->leftJoin('p.comments', 'c')
+            ->addSelect('COUNT(rl.id) AS HIDDEN likesCount')
+            ->addSelect('COUNT(rd.id) AS HIDDEN dislikesCount')
+            ->addSelect('COUNT(c.id) AS HIDDEN commentsCount')
+            ->addSelect('((COUNT(rl.id) - COUNT(rd.id)) * 10 + COUNT(c.id)) AS HIDDEN rating')
             ->groupBy('p.id')
-            ->orderBy('likesCount', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('rating', 'DESC');
+
+        return $qb->getQuery()->getResult();
     }
+
 
     public function getByUser(User $user): array
     {

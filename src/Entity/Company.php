@@ -24,16 +24,13 @@ class Company
     #[ORM\OneToMany(targetEntity: Vacancy::class, mappedBy: 'company', orphanRemoval: true)]
     private Collection $vacancies;
 
-    /**
-     * @var Collection<int, User>
-     */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'subordinateСompanies')]
-    private Collection $trustedPersons;
+    #[ORM\ManyToOne(inversedBy: 'companies')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function __construct()
     {
         $this->vacancies = new ArrayCollection();
-        $this->trustedPersons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -83,30 +80,17 @@ class Company
         return $this;
     }
 
-    /**
-     * @return Collection<int, User>
-     */
-    public function getTrustedPersons(): Collection
+    public function getOwner(): ?User
     {
-        return $this->trustedPersons;
+        return $this->owner;
     }
 
-    public function addTrustedPerson(User $trustedPerson): static
+    public function setOwner(?User $owner): static
     {
-        if (!$this->trustedPersons->contains($trustedPerson)) {
-            $this->trustedPersons->add($trustedPerson);
-            $trustedPerson->addSubordinateOmpany($this);
-        }
+        $this->owner = $owner;
 
         return $this;
     }
 
-    public function removeTrustedPerson(User $trustedPerson): static
-    {
-        if ($this->trustedPersons->removeElement($trustedPerson)) {
-            $trustedPerson->removeSubordinateOmpany($this);
-        }
-
-        return $this;
-    }
+    
 }

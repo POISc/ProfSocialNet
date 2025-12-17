@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{comment.content}}{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/css/baseDarkStyle.css">
+{% endblock %}
+
+{% block body %}
+    <form action="{{ path('comment_update', { id: comment.id }) }}" method="POST">
+        <input type="hidden" name="_method" value="PUT">
+        <input type="hidden" name="_token"
+            value="{{ csrf_token('update_comment_' ~ comment.id) }}">
+
+        <textarea name="content" required>{{ comment.content }}</textarea>
+
+        <button type="submit">Сохранить</button>
+    </form>
+{% endblock %}

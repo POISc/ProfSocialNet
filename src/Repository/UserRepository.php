@@ -8,6 +8,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Doctrine\ORM\Query\ResultSetMapping;
+use \Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -36,14 +38,45 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
     * @return User[] Returns an array of User objects
     */
-    public function findByNamePartial(string $searchTerm): array
+    public function serchByNameOrSkills(string $searchTerm): array
     {
-        return $this->createQueryBuilder('p')
-            ->where('p.fullName LIKE :searchTerm')
-            ->setParameter('searchTerm', '%' . $searchTerm . '%')
-            ->orderBy('p.fullName', 'ASC')
-            ->getQuery()
-            ->getResult();
+        $em = $this->getEntityManager();
+
+        $searchWords = array_filter(array_map('trim', explode(' ', $searchTerm)));
+        $skills = [];
+
+        $sql = "SELECT * FROM user u WHERE 1=1";
+        $params = [];
+
+        if (!empty($searchWords)) {
+            $nameConditions = [];
+            foreach ($searchWords as $i => $word) {
+                $nameConditions[] = "u.full_name LIKE :word{$i}";
+                $params["word{$i}"] = '%' . $word . '%';
+            }
+            $sql .= " AND (" . implode(' AND ', $nameConditions) . ")";
+        }
+
+        if (!empty($skills)) {
+            $skillConditions = [];
+            foreach ($skills as $i => $skill) {
+                $skillConditions[] = "JSON_CONTAINS(u.skils, :skill{$i})";
+                $params["skill{$i}"] = json_encode($skill);
+            }
+            $sql .= " OR (" . implode(' AND ', $skillConditions) . ")";
+        }
+
+        $rsm = new ResultSetMappingBuilder($em);
+        $rsm->addRootEntityFromClassMetadata(\App\Entity\User::class, 'u');
+
+        $query = $em->createNativeQuery($sql, $rsm);
+
+        foreach ($params as $key => $val) {
+            $query->setParameter($key, $val);
+        }
+
+        return $query->getResult();
+
     }
 
     //    /**

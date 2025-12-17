@@ -29,7 +29,13 @@ final class CommentController extends AbstractController
         $comment = new Comment();
         $comment->setAuthor($security->getUser());
         $comment->setPost($post);
-        $comment->setContent($request->request->get('content'));
+
+        $content = trim($request->request->get('content'));
+        if ($content === '') {
+            throw new BadRequestHttpException('Comment content is required');
+        }
+
+        $comment->setContent($content);
 
         $this->em->persist($comment);
         $this->em->flush();
@@ -37,5 +43,83 @@ final class CommentController extends AbstractController
         $notificationService->notifyUserComment($post, $security->getUser());
 
         return $this->redirectToRoute('post_view', ['id' => $post->getId()]);
+    }
+
+    #[Route('/comment/{id}', name: 'comment_update', methods: ['PUT'])]
+    public function updateComment(Comment $comment, Request $request, Security $security): Response {
+        $user = $security->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($comment->getAuthor() !== $user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (!$this->isCsrfTokenValid(
+            'update_comment_' . $comment->getId(),
+            $request->request->get('_token')
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token');
+        }
+
+        $content = trim($request->request->get('content'));
+        if ($content === '') {
+            throw new BadRequestHttpException('Comment content is required');
+        }
+
+        $comment->setContent($content);
+        $this->em->flush();
+
+        return $this->redirectToRoute('post_view', [
+            'id' => $comment->getPost()->getId(),
+        ]);
+    }
+
+    #[Route('/comment/{id}/change', name: 'change_comment_page', methods: ['GET'])]
+    public function changeComment(Comment $comment, Request $request, Security $security): Response {
+        $user = $security->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($comment->getAuthor() !== $user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $this->render('comment/changeComment.html.twig', [
+            'comment' => $comment,
+        ]);
+    }
+
+    #[Route('/comment/{id}', name: 'comment_delete', methods: ['DELETE'])]
+    public function deleteComment(Comment $comment, Request $request, Security $security): Response {
+        $user = $security->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($comment->getAuthor() !== $user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (!$this->isCsrfTokenValid(
+            'delete_comment_' . $comment->getId(),
+            $request->request->get('_token')
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token');
+        }
+
+        $postId = $comment->getPost()->getId();
+
+        $this->em->remove($comment);
+        $this->em->flush();
+
+        return $this->redirectToRoute('post_view', [
+            'id' => $postId,
+        ]);
     }
 }
