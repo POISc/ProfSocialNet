@@ -15,6 +15,7 @@ use App\Entity\Connection;
 use App\Repository\ConnectionRepository;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\NotificationService;
 
 final class ConnectionController extends AbstractController
 {
@@ -26,7 +27,7 @@ final class ConnectionController extends AbstractController
     }
 
     #[Route('/friend/add', name: 'app_friend_add', methods: ['POST'])]
-    public function addFriend(Request $request, Security $security, UserRepository $userRepository, ConnectionRepository $connectionRepository): RedirectResponse
+    public function addFriend(Request $request, Security $security, UserRepository $userRepository, ConnectionRepository $connectionRepository, NotificationService $notificationService): RedirectResponse
     {
         $user = $security->getUser();
 
@@ -50,11 +51,13 @@ final class ConnectionController extends AbstractController
             $connection->setTargetId($targetId);
             $connection->setTypes(ConnectionType::SUBSCRIBER);
             $this->em->persist($connection);
+            $notificationService->notifyUserSubscribtion($targetUser, $user);
         } else if ($connection->getTypes() === ConnectionType::SUBSCRIBER) {
             if($connection->getInitiator() === $user) {
                 throw new BadRequestHttpException('Connection already exists');
             } else {
                 $connection->setTypes(ConnectionType::FRIEND);
+                $notificationService->notifyUserSubscribtion($targetUser, $user);
             }
         } else {
             throw new BadRequestHttpException('Connection already exists');

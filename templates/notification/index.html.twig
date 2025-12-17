@@ -9,6 +9,22 @@
     {% include 'components/navigation-bar.html.twig' %}
 
     <div class="notification-section">
+        <div>
+            <div class="notifications-filter">
+                <a href="{{ path('app_notification', { filter: 'all' }) }}">
+                    Все
+                </a>
+
+                <a href="{{ path('app_notification', { filter: 'unread' }) }}">
+                    Непрочитанные
+                </a>
+
+                <a href="{{ path('app_notification', { filter: 'read' }) }}">
+                    Прочитанные
+                </a>
+            </div>
+        </div>
+
         <h2>Уведомления</h2>
         {% if notifications is empty %}
             <p>Нет новых уведомлений.</p>
@@ -24,15 +40,13 @@
                             поставил(а) лайк на ваш пост: 
                         {% elseif notification.eventType.value == 'dislike_to_post' %}
                             поставил(а) дизлайк на ваш пост: 
-                        {% elseif notification.eventType.value == 'comment_to_post' %}
-                            прокомментировал(а) ваш пост: 
-                        {% elseif notification.eventType.value == 'reply_to_comment' %}
-                            ответил(а) на ваш комментарий: 
+                        {% elseif notification.eventType.value == 'comment_on_post' %}
+                            прокомментировал(а) ваш пост:
                         {% elseif notification.eventType.value == 'subscription' %}
                             подписался(ась) на вас
                         {% endif %}
 
-                        {% if notification.subject %}
+                        {% if notification.subject and notification.eventType.value != 'subscription' %}
                             <a href="{{ path('post_view', {'id': notification.subject.id}) }}">
                                 "{{ notification.subject.content|slice(0, 15) }}{% if notification.subject.content|length > 15 %}...{% endif %}"
                             </a>
@@ -41,6 +55,22 @@
                                 подписался на вас
                             {% endif %}
                         {% endif %}
+
+                        <form action="{{ path('notification_toggle', { 'id': notification.id }) }}" method="POST">
+                            <input type="hidden" name="_method" value="PUT">
+                            <input type="hidden" name="_token" value="{{ csrf_token('toggle_notification_' ~ notification.id) }}">
+
+                            <button type="submit" class="mark-as-read-button">
+                                {{ notification.isRead ? 'Отметить как непрочитанное' : 'Отметить как прочитанное' }}
+                            </button>
+                        </form>
+
+                        <form action="{{ path('notification_delete', { 'id': notification.id }) }}" method="POST">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_notification_' ~ notification.id) }}">
+
+                            <button type="submit">Delete</button>
+                        </form>
                     </li>
                 {% endfor %}
             </ul>
