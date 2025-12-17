@@ -8,8 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\SecurityBundle\Security;
-use App\Entity\ConnectionType;
+use App\Enum\ConnectionType;
 use App\Entity\Connection;
 use App\Repository\ConnectionRepository;
 use App\Entity\User;
@@ -24,12 +25,12 @@ final class ConnectionController extends AbstractController
         $this->em = $em;
     }
 
-    #[Route('/friend/add', name: 'app_friend_add')]
-    public function addFriend(Request $request, Security $security, UserRepository $userRepository): RedirectResponse
+    #[Route('/friend/add', name: 'app_friend_add', methods: ['POST'])]
+    public function addFriend(Request $request, Security $security, UserRepository $userRepository, ConnectionRepository $connectionRepository): RedirectResponse
     {
         $user = $security->getUser();
 
-        $targetId = $request->query->get('target_id');
+        $targetId = $request->request->get('target_id');
 
         if (!$targetId || $user === null) {
             throw new BadRequestHttpException('Invalid parameters');
@@ -41,29 +42,74 @@ final class ConnectionController extends AbstractController
             throw new BadRequestHttpException('Invalid target user');
         }
   
-        $connection = findExistingConnection($user, ConnectionType::FRIEND, $targetUser);
+        $connection = $connectionRepository->findExistingConnection($user, $targetUser);
 
-        if($connection) {
-            throw new BadRequestHttpException('Such a connection already exists');
-        }
-        
-        $connection = findExistingConnection($user, ConnectionType::SUBSCRIBER, $targetUser);
-
-        if ($subscriber) {
-            if ($subscriber->getInitiator() === $targetUser) {
-                $subscriber->setType(ConnectionType::FRIEND);
+        if(!$connection) {
+            $connection = new Connection();
+            $connection->setUserInitiator($user);
+            $connection->setTargetId($targetId);
+            $connection->setTypes(ConnectionType::SUBSCRIBER);
+            $this->em->persist($connection);
+        } else if ($connection->getTypes() === ConnectionType::SUBSCRIBER) {
+            if($connection->getInitiator() === $user) {
+                throw new BadRequestHttpException('Connection already exists');
             } else {
-                throw new BadRequestHttpException('Such a connection already exists');
+                $connection->setTypes(ConnectionType::FRIEND);
             }
         } else {
-            $subscriber = new Connection();
-            $subscriber->setUser($user);
-            $subscriber->setTargetId($targetId);
-            $subscriber->setType(ConnectionType::SUBSCRIBER);
-            $this->em->persist($subscriber);
+            throw new BadRequestHttpException('Connection already exists');
         }
 
         $this->em->flush();
+
+        return $this->redirect($request->headers->get('referer'));
+    }
+
+    #[Route('/friend/remove', name: 'app_friend_remove', methods: ['POST'])]
+    public function removeFriend(Request $request, Security $security, UserRepository $userRepository, ConnectionRepository $connectionRepository): RedirectResponse
+    {
+        $user = $security->getUser();
+
+        $targetId = $request->request->get('target_id');
+
+        $targetUser = $userRepository->find($targetId);
+
+        if (!$targetUser || $targetUser === $user) {
+            throw new BadRequestHttpException('Invalid target user');
+        }
+  
+        $connection = $connectionRepository->findExistingConnection($user, $targetUser);
+
+        if($connection) {
+            $connection->setUserInitiator($targetUser);
+            $connection->setTypes(ConnectionType::SUBSCRIBER);
+            $connection->setTargetId($user->getId());
+            
+            $this->em->flush();
+        }
+
+        return $this->redirect($request->headers->get('referer'));
+    }
+
+    #[Route('/subscribe/remove', name: 'app_unsubscribe', methods: ['POST'])]
+    public function removeSubscribe(Request $request, Security $security, UserRepository $userRepository, ConnectionRepository $connectionRepository): RedirectResponse
+    {
+        $user = $security->getUser();
+
+        $targetId = $request->request->get('target_id');
+
+        $targetUser = $userRepository->find($targetId);
+
+        if (!$targetUser || $targetUser === $user) {
+            throw new BadRequestHttpException('Invalid target user');
+        }
+  
+        $connection = $connectionRepository->findExistingConnection($user, $targetUser);
+
+        if($connection) {
+            $this->em->remove($connection);            
+            $this->em->flush();
+        }
 
         return $this->redirect($request->headers->get('referer'));
     }

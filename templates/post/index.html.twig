@@ -29,9 +29,7 @@
     <div class="post-section">
         <div class="post-box">
             <div class="post-head">
-                <a class="nav-link">
-                    {{ post.author.fullName }}
-                </a>
+                <div class="author-post"><a href="{{ path('app_user', {'id': post.author.id}) }}">{{ post.author.fullName }}</a></div>
             </div> 
 
             <div class="post-body">

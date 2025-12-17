@@ -21,17 +21,21 @@ class ConnectionRepository extends ServiceEntityRepository
     /**
      * @return Connection[] Returns an array of Connection objects
      */
-    public function findExistingConnection(User $userA, ConnectionType $connectionType, User $userB): ?Connection
+    public function findExistingConnection(User $userA, User $userB): ?Connection
     {
+        $subTypes = [
+            ConnectionType::SUBSCRIBER,
+            ConnectionType::FRIEND
+        ];
+
         return $this->createQueryBuilder('c')
-            ->andWhere('(c.userInitiator = :userA AND c.targetUser = :userB) OR (c.userInitiator = :userB AND c.targetUser = :userA)')
-            ->andWhere('c.targetId = :targetId')
-            ->setParameter('userA', $userA.getId())
-            ->setParameter('types', $connectionType)
+            ->andWhere('(c.userInitiator = :userA AND c.targetId = :userB) OR (c.userInitiator = :userB AND c.targetId = :userA)')
+            ->andWhere('c.types IN (:types)')
+            ->setParameter('userA', $userA->getId())
+            ->setParameter('types', $subTypes)
             ->setParameter('userB', $userB->getId())
             ->getQuery()
             ->getOneOrNullResult();
-        ;
     }
 
     public function findPendingJobRequest(User $initiator, $targetId): ?Connection
@@ -44,7 +48,7 @@ class ConnectionRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->andWhere('c.userInitiator = :initiator')
             ->andWhere('c.targetId = :targetId')
-            ->andWhere('c.type IN (:types)')
+            ->andWhere('c.types IN (:types)')
             ->setParameters([
                 'initiator' => $initiator,
                 'targetId' => $targetId,

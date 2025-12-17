@@ -55,12 +55,12 @@ class Connection
 
     public function getTargetId(): ?int
     {
-        return $this->targetUser;
+        return $this->targtargetIdetUser;
     }
 
     public function setTargetId(?int $targetId): static
     {
-        $this->targetUser = $targetUser;
+        $this->targetId = $targetId;
 
         return $this;
     }

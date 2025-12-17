@@ -13,6 +13,9 @@ use App\Entity\Post;
 use App\Repository\PostRepository;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Entity\Connection;
+use App\Repository\ConnectionRepository;
+use App\Enum\ConnectionType;
 use App\Repository\ReactionRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -22,13 +25,16 @@ final class UserController extends AbstractController
     private Security $security;
     private PostRepository $postRepository;
     private ReactionRepository $reactionRepository;
+    private ConnectionRepository $connectionRepository;
+    
 
-    public function __construct(UserRepository $userRepository, Security $security, PostRepository $postRepository, ReactionRepository $reactionRepository)
+    public function __construct(UserRepository $userRepository, Security $security, PostRepository $postRepository, ReactionRepository $reactionRepository, ConnectionRepository $connectionRepository)
     {
         $this->userRepository = $userRepository;
         $this->security = $security;
         $this->postRepository = $postRepository;
         $this->reactionRepository = $reactionRepository;
+        $this->connectionRepository = $connectionRepository;
     }
 
     #[Route('/user/{id}', name: 'app_user', requirements: ['id' => '\d+'], methods: ['GET'])]
@@ -56,9 +62,25 @@ final class UserController extends AbstractController
         $referer = $request->headers->get('referer');
         $session->set('return_last_safe_url', $referer);
 
+        $connection = $this->connectionRepository->findExistingConnection($this->security->getUser(), $user);
+        $actionWithConnection = 'Удалить из друзей';
+        if($connection) {
+            if($connection->getInitiator() === $this->security->getUser()) {
+                if($connection->getTypes() === ConnectionType::SUBSCRIBER) {
+                    $actionWithConnection = 'Отписаться';
+                }
+            } else {
+                if($connection->getTypes() === ConnectionType::SUBSCRIBER) {
+                    $actionWithConnection = 'Добавить в друзья';
+                }
+            }
+        } else {
+            $actionWithConnection = 'Подписаться';
+        }
 
         return $this->render('user/index.html.twig', [
             'user' => $user,
+            'actionWithConnection' => $actionWithConnection,
             'searchTerm' => $searchTerm,
             'foundUsers' => $foundUsers,
             'posts' => $posts,
